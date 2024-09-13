@@ -1,0 +1,7 @@
+{
+  "name": "ConnectObjects",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
