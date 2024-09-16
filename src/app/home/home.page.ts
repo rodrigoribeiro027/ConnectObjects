@@ -8,7 +8,7 @@ import { IonicModule } from '@ionic/angular';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton,IonicModule],
+  imports: [IonicModule],
 })
 export class HomePage implements AfterViewInit {
 
