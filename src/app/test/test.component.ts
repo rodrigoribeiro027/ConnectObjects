@@ -79,10 +79,16 @@ export class TestComponent implements AfterViewInit {
       button.addEventListener('click', () => this.displayPoint(key));
       buttonContainer.appendChild(button);
     });
+    
+    const printButton = document.createElement('ion-button');
+    printButton.textContent = 'Capturar Imagem';
+    printButton.color = 'secondary';
+    printButton.addEventListener('click', () => this.captureImage());
+    buttonContainer.appendChild(printButton);
   }
 
   private getButtonColor(key: string): string {
-    const colors = ['primary', 'secondary', 'tertiary', 'success', 'warning', 'danger'];
+    const colors = ['primary'];
     const index = parseInt(key) % colors.length;
     return colors[index];
   }
@@ -234,6 +240,18 @@ export class TestComponent implements AfterViewInit {
       };
     } else {
       return { x: 0, y: 0 };
+    }
+  }
+
+  private captureImage() {
+    if (this.stage) {
+      const dataURL = this.stage.toDataURL();
+      const link = document.createElement('a');
+      link.href = dataURL;
+      link.download = 'konva-image.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   }
 }
