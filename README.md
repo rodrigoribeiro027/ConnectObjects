@@ -12,7 +12,14 @@ Este projeto é uma aplicação web construída com Angular e Konva.js que permi
 ## 🎨 Captura de Tela
 
 ![Exemplo do Projeto de Conexão de Objetos com Angular e Konva.js](https://github.com/rodrigoribeiro027/ConnectObjects/blob/main/src/assets/transformObjects.png)
-                                                                    
+
+
+![Teste vindo com Coordenadas Especificas Da Imagem](https://github.com/rodrigoribeiro027/ConnectObjects/blob/main/src/assets/Testback.png)
+
+### 📄 Relatorio Gerado por PDF e Imagem
+
+[Relatorio](https://github.com/rodrigoribeiro027/ConnectObjects/blob/main/src/assets/Relatório.pdf)
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **Angular**: Framework robusto para a construção de interfaces web dinâmicas e responsivas.

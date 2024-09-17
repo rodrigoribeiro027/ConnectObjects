@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import Konva from 'konva';
+import jsPDF from 'jspdf';
 
 @Component({
   selector: 'app-test',
@@ -10,25 +11,30 @@ import Konva from 'konva';
   imports: [IonicModule],
 })
 export class TestComponent implements AfterViewInit {
-
   private pontos = {
     "1": {
-      "id": "uzb6g5ejmd4t",
-      "Retângulo": "x:(270, y:375)",
-      "Círculo": "x:(51, y:324)",
-      "Mensagem": "Quadrado Roxo"
+      "id": "2inliekvwors",
+      "Retângulo": "x:(26, y:399)",
+      "Círculo": "x:(165, y:335)",
+      "Mensagem": "Retangulo Roxo"
     },
     "2": {
-      "id": "1ez4l2gnz4ja",
-      "Retângulo": "x:(670, y:0)",
-      "Círculo": "x:(740, y:301)",
-      "Mensagem": "O melhor"
+      "id": "wkwjnpmb24s4",
+      "Retângulo": "x:(10, y:13)",
+      "Círculo": "x:(379, y:338)",
+      "Mensagem": "Circulo Verde"
     },
     "3": {
-      "id": "1aab79c0ge65",
-      "Retângulo": "x:(225, y:298)",
-      "Círculo": "x:(737, y:303)",
-      "Mensagem": "Parede Amarela"
+      "id": "17zeqfba4k74",
+      "Retângulo": "x:(28, y:12)",
+      "Círculo": "x:(381, y:179)",
+      "Mensagem": "retângulo com uma extremidade arredondada Azul"
+    },
+    "4": {
+      "id": "imxp88rn9pkk",
+      "Retângulo": "x:(651, y:405)",
+      "Círculo": "x:(172, y:178)",
+      "Mensagem": "Pentágono Vermelho"
     }
   };
 
@@ -72,19 +78,25 @@ export class TestComponent implements AfterViewInit {
 
     buttonContainer.innerHTML = '';
 
-    Object.keys(this.pontos).forEach(key => {
+    Object.keys(this.pontos).forEach((key) => {
       const button = document.createElement('ion-button');
       button.textContent = `Ponto ${key}`;
       button.color = this.getButtonColor(key);
       button.addEventListener('click', () => this.displayPoint(key));
       buttonContainer.appendChild(button);
     });
-    
+
     const printButton = document.createElement('ion-button');
     printButton.textContent = 'Capturar Imagem';
     printButton.color = 'secondary';
     printButton.addEventListener('click', () => this.captureImage());
     buttonContainer.appendChild(printButton);
+
+    const pdfButton = document.createElement('ion-button');
+    pdfButton.textContent = 'Salvar como PDF';
+    pdfButton.color = 'primary';
+    pdfButton.addEventListener('click', () => this.saveAsPDF());
+    buttonContainer.appendChild(pdfButton);
   }
 
   private getButtonColor(key: string): string {
@@ -149,7 +161,7 @@ export class TestComponent implements AfterViewInit {
     const line = new Konva.Line({
       points: [circleEdge.x, circleEdge.y, rectEdge.x, rectEdge.y],
       stroke: 'black',
-      strokeWidth: 2,
+      strokeWidth: 4,
       lineCap: 'round',
       lineJoin: 'round',
     });
@@ -248,10 +260,50 @@ export class TestComponent implements AfterViewInit {
       const dataURL = this.stage.toDataURL();
       const link = document.createElement('a');
       link.href = dataURL;
-      link.download = 'konva-image.png';
+      link.download = 'Imagem.png';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
+  }
+
+  private saveAsPDF() {
+    if (!this.stage) return;
+    const pdf = new jsPDF('landscape', 'px', [this.stage.width(), this.stage.height() + 100]);
+    const now = new Date();
+    const dateStr = now.toLocaleDateString();
+    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const title = `Relatório - ${dateStr} ${timeStr}`;
+    const barYPosition = 20; 
+    const titleWidth = pdf.getTextWidth(title);
+    const titleXPosition = (pdf.internal.pageSize.getWidth() - titleWidth) / 2;
+    const imageYPosition = 250; 
+    const imageXPosition = 20; 
+    const originalWidth = this.stage.width();
+    const originalHeight = this.stage.height();
+    const scaleFactor = 0.5;
+    const imageWidth = originalWidth * scaleFactor;
+    const imageHeight = originalHeight * scaleFactor;
+    const imageData = this.stage.toDataURL({ pixelRatio: 2 });
+    const footerYPosition = pdf.internal.pageSize.getHeight() - 40;
+    pdf.setFontSize(20);
+    pdf.text(title, titleXPosition, barYPosition + 15); 
+    pdf.addImage(imageData, 'PNG', imageXPosition, imageYPosition, imageWidth, imageHeight);
+    pdf.setFontSize(16);
+    pdf.text(`Nome: retângulo com uma extremidade arredondada Azul`, 20, 60);
+    pdf.text(`Grupo: grupo 2`, 20, 80);
+    pdf.text(`Operação: Especificação de Objeto`, 20, 100);
+    pdf.text(`Descrição: retângulo com uma extremidade arredondada`, 20, 120);
+    pdf.text(`Tabela: tabela A`, 20, 140);
+    pdf.setFontSize(12);
+    pdf.setTextColor(150);
+    pdf.text("Este documento é confidencial e para uso interno somente.", 20, footerYPosition);
+    pdf.setDrawColor(150);
+    pdf.setLineWidth(0.5);
+    pdf.line(20, footerYPosition - 10, pdf.internal.pageSize.getWidth() - 20, footerYPosition - 10);
+    pdf.setFontSize(10);
+    pdf.text("Gerado por Sistema", 20, footerYPosition + 15);
+    pdf.text(`Página 1 de 1`, pdf.internal.pageSize.getWidth() - 60, footerYPosition + 15);
+    pdf.save('Relatório.pdf');
   }
 }

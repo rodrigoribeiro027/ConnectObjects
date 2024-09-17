@@ -84,7 +84,7 @@ export class HomePage implements AfterViewInit {
       });
       const line = new Konva.Line({
         stroke: 'black',
-        strokeWidth: 2,
+        strokeWidth: 4,
         id: 'line',
       });
       layer.add(line);
