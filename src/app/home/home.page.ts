@@ -2,6 +2,7 @@ import { AlertController } from '@ionic/angular';
 import { Component, AfterViewInit } from '@angular/core';
 import Konva from 'konva';
 import { IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +19,7 @@ export class HomePage implements AfterViewInit {
   private pontosCounter = 1; 
   private pontos: any = {}; 
 
-  constructor(private alertController: AlertController) {} 
+  constructor(private alertController: AlertController, private router: Router) {}
   ngAfterViewInit() {
     const width = 820;
     const height = 520;
@@ -190,24 +191,35 @@ export class HomePage implements AfterViewInit {
 
       layer.add(text);
 
-      const updateText = () => {
-        const inputText = (document.getElementById('text-input') as HTMLInputElement).value;
+      const updateText = async () => {
+        const inputText = (document.getElementById('text-input') as HTMLInputElement).value.trim();
+      
+        if (!inputText) {
+          const alert = await this.alertController.create({
+            header: 'Erro',
+            message: 'A mensagem não pode estar vazia!',
+            buttons: ['OK'],
+          });
+          await alert.present();
+          return;
+        }
+      
         text.text(inputText);
         this.rectMessage = inputText;
-
+      
         text.position({
           x: rect.x() + (rect.width() - text.width()) / 2,
           y: rect.y() + (rect.height() - text.height()) / 2,
         });
-
+      
         layer.batchDraw();
-
+      
         this.updateMessageDetails(`ID: ${rect.id()}, Mensagem: ${inputText}`);
       }
-
+      
       document.getElementById('update-text')?.addEventListener('click', updateText);
 
-      const saveData = () => {
+      const saveData = async () => {
         this.pontos[this.pontosCounter] = {
           id: this.generateUniqueId(),
           "Retângulo": `x:(${this.rectPosition.x}, y:${this.rectPosition.y})`,
@@ -220,6 +232,28 @@ export class HomePage implements AfterViewInit {
       }
 
       document.getElementById('confirm-button')?.addEventListener('click', async () => {
+        if (!this.rectMessage) {
+          const alert = await this.alertController.create({
+            header: 'Erro',
+            message: 'A mensagem não pode estar vazia!',
+            buttons: ['OK'],
+          });
+          await alert.present();
+          return;
+        }
+        if (
+          this.rectPosition.x === 0 && this.rectPosition.y === 0 &&
+          this.circlePosition.x === 0 && this.circlePosition.y === 0
+        ) {
+        const alert = await this.alertController.create({
+            header: 'Ação Necessária',
+            message: 'Você precisa mover os itens na tela antes de confirmar.',
+            buttons: ['OK'],
+        });
+        await alert.present();
+        return;
+        }
+        
         const alert = await this.alertController.create({
           header: 'Confirmar Ação',
           message: 'Você realmente deseja confirmar?',
@@ -235,6 +269,7 @@ export class HomePage implements AfterViewInit {
               text: 'Confirmar',
               handler: () => {
                 saveData();
+                this.router.navigate(['/test']);
               },
             },
           ],
