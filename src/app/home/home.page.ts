@@ -1,4 +1,4 @@
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/angular/standalone';
+import { AlertController } from '@ionic/angular'; 
 import { Component, AfterViewInit } from '@angular/core';
 import Konva from 'konva';
 import { IonicModule } from '@ionic/angular';
@@ -18,6 +18,7 @@ export class HomePage implements AfterViewInit {
   private pontosCounter = 1; 
   private pontos: any = {}; 
 
+  constructor(private alertController: AlertController) {} 
   ngAfterViewInit() {
     const width = 820;
     const height = 520;
@@ -59,7 +60,12 @@ export class HomePage implements AfterViewInit {
         id: rectId,
       });
       layer.add(rect);
-
+      rect.on('mouseenter', function () {
+        stage.container().style.cursor = 'move';
+      });
+      stage.on('mouseenter', function () {
+        stage.container().style.cursor = 'default';
+      });
       const circle2 = new Konva.Circle({
         x: (3 * width) / 4,
         y: height / 2,
@@ -72,7 +78,9 @@ export class HomePage implements AfterViewInit {
         id: circleId,
       });
       layer.add(circle2);
-
+      circle2.on('mouseenter', function () {
+        stage.container().style.cursor = 'move';
+      });
       const line = new Konva.Line({
         stroke: 'black',
         strokeWidth: 2,
@@ -211,7 +219,28 @@ export class HomePage implements AfterViewInit {
         console.log(JSON.stringify({ pontos: this.pontos }, null, 2));
       }
 
-      document.getElementById('confirm-button')?.addEventListener('click', saveData);
+      document.getElementById('confirm-button')?.addEventListener('click', async () => {
+        const alert = await this.alertController.create({
+          header: 'Confirmar Ação',
+          message: 'Você realmente deseja confirmar?',
+          buttons: [
+            {
+              text: 'Cancelar',
+              role: 'cancel',
+              handler: () => {
+                console.log('Ação cancelada');
+              },
+            },
+            {
+              text: 'Confirmar',
+              handler: () => {
+                saveData();
+              },
+            },
+          ],
+        });
+        await alert.present();
+      });
 
       layer.draw();
       updateLine();
@@ -236,21 +265,5 @@ export class HomePage implements AfterViewInit {
     const randomPart = Math.random().toString(36).substr(2, 8);
     const timePart = Date.now().toString(36).substr(-4);
     return `${randomPart}${timePart}`;
-  }
-
-  private drawPoints(points: { x: number, y: number, color: string }[], layer: Konva.Layer) {
-    points.forEach(point => {
-      const circle = new Konva.Circle({
-        x: point.x,
-        y: point.y,
-        radius: 7,
-        fill: point.color, 
-        stroke: 'black',
-        strokeWidth: 1,
-      });
-      layer.add(circle);
-    });
-
-    layer.draw(); 
   }
 }
